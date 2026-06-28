@@ -93,9 +93,10 @@ let
       # after the package (`quickjs-ng`), which is not itself an applet, so
       # defaultApplet=qjs makes a bare `quickjs-ng script.js` run the
       # interpreter; an argv[0] of `qjs` does the same and `qjsc` runs the
-      # compiler. The generator sanitizes applet→symbol names, so the package's
-      # hyphen is irrelevant (only the `qjs`/`qjsc` applets become symbols).
-      printf '%s\n' qjs qjsc > multicall/apps.list
+      # compiler. The table dispatcher reads `applets.list` as TSV
+      # `<applet>\t<symbol-prefix>`: the objcopy above renamed each `main` to
+      # `qjs_main`/`qjsc_main`, so the symbol column is just the applet name.
+      printf 'qjs\tqjs\nqjsc\tqjsc\n' > multicall/applets.list
 ${lib.multicallTableDispatcherC { name = "quickjs-ng"; defaultApplet = "qjs"; }}
       $CC -O2 -c -o multicall/dispatcher.o multicall/dispatcher.c
 
