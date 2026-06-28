@@ -96,7 +96,7 @@ let
       # compiler. The generator sanitizes applet→symbol names, so the package's
       # hyphen is irrelevant (only the `qjs`/`qjsc` applets become symbols).
       printf '%s\n' qjs qjsc > multicall/apps.list
-${lib.multicallDispatcherC { name = "quickjs-ng"; defaultApplet = "qjs"; }}
+${lib.multicallTableDispatcherC { name = "quickjs-ng"; defaultApplet = "qjs"; }}
       $CC -O2 -c -o multicall/dispatcher.o multicall/dispatcher.c
 
       # Final link. On mingw, force a fully static exe (-static folds libc,
