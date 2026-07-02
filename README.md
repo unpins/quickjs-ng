@@ -66,10 +66,11 @@ The [Releases](https://github.com/unpins/quickjs-ng/releases) page has standalon
   compiler) are folded into one binary at `$out/bin/quickjs-ng`, with `qjs` and
   `qjsc` as `argv[0]`-dispatch aliases. The binary is named after the package
   (the catalog convention / CI portability gate); a bare `quickjs-ng` runs the
-  interpreter (`defaultApplet`), and `quickjs-ng --unpin-program=qjsc …` reaches
-  the compiler. Both share the whole engine, so we don't prefix-rename every
-  global; `nm` confirms `qjs.c`/`qjsc.c` each define only `main` and `help`,
-  which are renamed per program. See `multicall.nix`.
+  interpreter (`defaultProgram`), and `quickjs-ng --unpin-program=qjsc …` reaches
+  the compiler. On Linux/macOS the fold is done by the unpin-llvm engine
+  (per-program bitcode module); Windows uses a source-level rename instead —
+  `qjs.c`/`qjsc.c` each define only `main` and `help`, renamed per program (see
+  `multicall.nix`).
 - **REPL + standalone loader embedded as bytecode.** quickjs-ng ships the
   interactive REPL (`repl.js`) and the standalone-module loader (`standalone.js`)
   pre-compiled to QuickJS bytecode (`gen/repl.c`, `gen/standalone.c`) right in
@@ -85,3 +86,7 @@ The [Releases](https://github.com/unpins/quickjs-ng/releases) page has standalon
 - **Static linking, per target.** Linux/macOS link fully static (musl) /
   libSystem-only; on Windows `-static` folds libc, libwinpthread and libgcc in,
   so the `.exe` imports only system DLLs.
+- **Tests.** quickjs-ng's suite is the ECMAScript `test262` conformance corpus —
+  a large external data set run by a separate harness, not a quick in-tree `make
+  check` — so it isn't wired into the build. The release smoke test evaluates a
+  computed expression to confirm the interpreter runs JS.
