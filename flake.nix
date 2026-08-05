@@ -62,17 +62,16 @@
       # qjs has no `--version` flag (its banner only prints via `-h`, which
       # exits 1), so smoke by evaluating a computed marker — proves the
       # interpreter actually runs JS and exits 0.
-      smoke = [ "-e" "console.log('quickjs-ng ' + 6 * 7)" ];
+      smoke = [ "--unpin-program=qjs" "-e" "console.log('quickjs-ng ' + 6 * 7)" ];
       smokePattern = "quickjs-ng 42";
 
       # Build via the unpin-llvm engine + emit a bitcode multicall module. Pure C
       # — no requires.cxx. `qjs` and `qjsc` are the two real linked binaries;
       # `quickjs-ng` is the package/fold name, not a program, so a bare
-      # invocation runs the interpreter (defaultProgram = "qjs").
+      # invocation lists them.
       engine = "unpin-llvm";
       multicall = {
         programs = [ { name = "qjs"; } { name = "qjsc"; } ];
-        defaultProgram = "qjs";
       };
       # linux + darwin both self-fold via the engine; windows uses windowsBuild
       # (the objcopy fold in ./multicall.nix), so build never sees windows.

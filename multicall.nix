@@ -90,14 +90,13 @@ let
       $OBJCOPY --redefine-syms=multicall/qjsc.redef multicall/obj/qjsc.o
 
       # Dispatcher (shared canonical generator). The canonical binary is named
-      # after the package (`quickjs-ng`), which is not itself an applet, so
-      # defaultApplet=qjs makes a bare `quickjs-ng script.js` run the
-      # interpreter; an argv[0] of `qjs` does the same and `qjsc` runs the
-      # compiler. The table dispatcher reads `applets.list` as TSV
+      # after the package (`quickjs-ng`), which is not itself an applet, so a
+      # bare invocation lists the two; an argv[0] of `qjs` runs the interpreter
+      # and `qjsc` the compiler. The table dispatcher reads `applets.list` as TSV
       # `<applet>\t<symbol-prefix>`: the objcopy above renamed each `main` to
       # `qjs_main`/`qjsc_main`, so the symbol column is just the applet name.
       printf 'qjs\tqjs\nqjsc\tqjsc\n' > multicall/applets.list
-${lib.multicallTableDispatcherC { name = "quickjs-ng"; defaultApplet = "qjs"; }}
+${lib.multicallTableDispatcherC { name = "quickjs-ng"; }}
       $CC -O2 -c -o multicall/dispatcher.o multicall/dispatcher.c
 
       # Final link. On mingw, force a fully static exe (-static folds libc,
