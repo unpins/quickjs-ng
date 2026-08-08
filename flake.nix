@@ -13,13 +13,12 @@
   # after the package, as the action-build gate requires), with `qjs` and `qjsc`
   # as argv[0]-dispatch UNPIN_META aliases.
   #
-  # Linux + darwin: build via the unpin-llvm engine + emit a bitcode multicall
+  # Every target builds via the unpin-llvm engine + emits a bitcode multicall
   # module — the standalone self-folds qjs + qjsc into one `quickjs-ng` binary
   # from the captured module.bc. quickjs-ng's CMake links the two exes under
   # their plain names (`qjs_exe` carries OUTPUT_NAME "qjs", `qjsc` builds as
   # `qjsc`), so the link sidecars match the program list with no OUTPUT_NAME
-  # postPatch. The old objcopy/source-rename fold in ./multicall.nix can't run on
-  # the engine's -flto bitcode objects, so it's reserved for the windows path.
+  # postPatch.
   #
   # quickjs-ng is the community-maintained fork of Fabrice Bellard's QuickJS
   # (https://github.com/quickjs-ng/quickjs). nixpkgs pins v0.14.0; we take the
@@ -43,9 +42,7 @@
         sha256 = hash;
       };
 
-      # Repoint pkgsStatic.quickjs-ng at the v0.15.1 tag. We only borrow the
-      # musl-static stdenv + src here; multicall.nix replaces the (CMake) build
-      # with a direct compile of the .c files.
+      # Repoint quickjs-ng at the v0.15.1 tag; the stock CMake build is kept.
       retarget = drv: drv.overrideAttrs (_old: {
         version = "0.15.1";
         src = ngSrc "v0.15.1" "10llzyjmlmm85jc6g4wjnigsqj2mjvk4fxvg1jzfwf3bs0b897bp";
@@ -71,21 +68,17 @@
       # invocation lists them.
       engine = "unpin-llvm";
       multicall = {
+        windows = true;
         programs = [ { name = "qjs"; } { name = "qjsc"; } ];
       };
-      # linux + darwin both self-fold via the engine; windows uses windowsBuild
-      # (the objcopy fold in ./multicall.nix), so build never sees windows.
       build = pkgs: retarget pkgs.pkgsStatic.quickjs-ng;
       windowsBuild = pkgs:
-        let
-          cross = ulib.mingwStaticCross pkgs;
-          # quickjs-ng includes <pthread.h> and links -lpthread (worker threads,
-          # JS atomics) on every platform; mingw needs winpthreads for the
-          # header + static lib (same as aom/vim's windows builds).
-          base = (retarget cross.quickjs-ng).overrideAttrs (o: {
-            buildInputs = (o.buildInputs or [ ]) ++ [ cross.windows.pthreads ];
-          });
-        in
-        import ./multicall.nix { lib = pkgs.lib // ulib; } { inherit pkgs; quickjs = base; };
+        let cross = ulib.mingwStaticCross pkgs; in
+        # quickjs-ng includes <pthread.h> and links -lpthread (worker threads,
+        # JS atomics) on every platform; mingw needs winpthreads for the header
+        # + static lib (same as aom/vim's windows builds).
+        (retarget cross.quickjs-ng).overrideAttrs (o: {
+          buildInputs = (o.buildInputs or [ ]) ++ [ cross.windows.pthreads ];
+        });
     };
 }
