@@ -67,10 +67,8 @@ The [Releases](https://github.com/unpins/quickjs-ng/releases) page has standalon
   `qjsc` as `argv[0]`-dispatch aliases. The binary is named after the package
   (the catalog convention / CI portability gate); a bare `quickjs-ng` runs the
   interpreter (`defaultProgram`), and `quickjs-ng --unpin-program=qjsc …` reaches
-  the compiler. On Linux/macOS the fold is done by the unpin-llvm engine
-  (per-program bitcode module); Windows uses a source-level rename instead —
-  `qjs.c`/`qjsc.c` each define only `main` and `help`, renamed per program (see
-  `multicall.nix`).
+  the compiler. The fold is done by the unpin-llvm engine (per-program
+  bitcode module) on every platform, Windows included.
 - **REPL + standalone loader embedded as bytecode.** quickjs-ng ships the
   interactive REPL (`repl.js`) and the standalone-module loader (`standalone.js`)
   pre-compiled to QuickJS bytecode (`gen/repl.c`, `gen/standalone.c`) right in
