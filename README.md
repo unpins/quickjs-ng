@@ -17,12 +17,12 @@ Part of the [unpins](https://unpins.org) catalog; install it with [`unpin`](http
 
 ## Usage
 
-Run the `qjs` interpreter with [unpin](https://github.com/unpins/unpin):
+Run the interpreter with [unpin](https://github.com/unpins/unpin):
 
 ```bash
-unpin qjs script.js              # run a script
-unpin qjs -e 'console.log(1+1)'  # run a one-liner
-unpin qjs -i                     # interactive REPL
+unpin quickjs-ng --unpin-program=qjs script.js              # run a script
+unpin quickjs-ng --unpin-program=qjs -e 'console.log(1+1)'  # run a one-liner
+unpin quickjs-ng --unpin-program=qjs -i                     # interactive REPL
 ```
 
 To install it onto your PATH:
@@ -42,13 +42,13 @@ qjsc -e -o out.c script.js       # compile to a C bytecode array
 
 ```bash
 nix build github:unpins/quickjs-ng
-./result/bin/quickjs-ng -e 'console.log("hi")'
+./result/bin/quickjs-ng --unpin-program=qjs -e 'console.log("hi")'
 ```
 
 Or run directly:
 
 ```bash
-nix run github:unpins/quickjs-ng -- -e 'console.log("hi")'
+nix run github:unpins/quickjs-ng -- --unpin-program=qjs -e 'console.log("hi")'
 ```
 
 The first invocation will offer to add the [unpins.cachix.org](https://unpins.cachix.org) substituter so most pulls come pre-built.
@@ -65,9 +65,10 @@ The [Releases](https://github.com/unpins/quickjs-ng/releases) page has standalon
 - **Single multicall binary.** `qjs` (interpreter) and `qjsc` (bytecode
   compiler) are folded into one binary at `$out/bin/quickjs-ng`, with `qjs` and
   `qjsc` as `argv[0]`-dispatch aliases. The binary is named after the package
-  (the catalog convention / CI portability gate); a bare `quickjs-ng` runs the
-  interpreter (`defaultProgram`), and `quickjs-ng --unpin-program=qjsc …` reaches
-  the compiler. The fold is done by the unpin-llvm engine (per-program
+  (the catalog convention / CI portability gate), and is not a program of its
+  own, so a bare `quickjs-ng` lists the two and exits 1;
+  `quickjs-ng --unpin-program=qjsc …` reaches the compiler. The fold is done by
+  the unpin-llvm engine (per-program
   bitcode module) on every platform, Windows included.
 - **REPL + standalone loader embedded as bytecode.** quickjs-ng ships the
   interactive REPL (`repl.js`) and the standalone-module loader (`standalone.js`)
