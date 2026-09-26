@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.15.1-1] - 2026-09-26
+
 Initial release — `quickjs-ng` 0.15.1 as a single self-contained binary, built
 natively for Linux, macOS, and Windows.
 
